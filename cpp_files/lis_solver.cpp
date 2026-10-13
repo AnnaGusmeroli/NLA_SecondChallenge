@@ -21,7 +21,8 @@ namespace lis_solver
     Result solve(
         const Eigen::SparseMatrix<double>& A_eigen,
         const Eigen::VectorXd& b_eigen,
-        double tolerance
+        double tolerance,
+        const std::string& solver_choice
     ) {
         //Check that the matrix is square
         if (A_eigen.rows() != A_eigen.cols()) {
@@ -126,7 +127,7 @@ namespace lis_solver
 
         // Set solver options: BICGSTAB with ILU preconditioner and specified tolerance
         std::ostringstream options_stream;
-        options_stream << "-i bicgstab -p ilu -ilu_fill 1 -tol "
+        options_stream << "-i " << solver_choice << " -p ilu -ilu_fill 1 -tol "
                        << std::setprecision(17)
                        << std::scientific
                        << tolerance;

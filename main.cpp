@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
     /* Ex 2:Solve the eigenvalue problem ATAx= λxusing the proper solver provided by the Eigen
     library. Report the two largest computed singular values of A. */
     std::cout << "Exercise 2: " << std::endl;
+    Eigen::MatrixXd noisy_image = image;
     
 
     // Ex 3:
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
     // Solve the linear system A2 * x = w using the lis_solver::solve function, that we introduced in the lis_solver.hpp file.
     // The function returns a lis_solver::Result struct that contains the solution vector, the number of iterations, and the residual.
     // It was implemented using the LIS library. In this way we can run main.cpp directly without having to compile the LIS library separately using .mtx files.
-    lis_solver::Result result = lis_solver::solve(A2, w, tolerance); //Since A2 is not symmetric, we can use the Bicgstab method with ILU preconditioner
+    lis_solver::Result result = lis_solver::solve(A2, w, tolerance, "bicgstab"); //Since A2 is not symmetric, we can use the Bicgstab method with ILU preconditioner
 
     std::cout << "Solved the linear system A2 * x = w using the bicgstab method with ILU preconditioner from the lis library." << std::endl;
     std::cout << "Tolerance: " << tolerance << std::endl;
