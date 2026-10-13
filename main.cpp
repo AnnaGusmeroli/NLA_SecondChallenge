@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    // Ex 1:
+    // Ex 1: ciao
     std::cout << std::endl;
     std::cout << "Exercise 1: " << std::endl;
     Eigen::MatrixXd image = utilities::get_matrix_from_file("deer.jpg");
