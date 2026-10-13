@@ -19,6 +19,7 @@ namespace lis_solver
     Result solve(
         const Eigen::SparseMatrix<double>& A_eigen,
         const Eigen::VectorXd& b_eigen,
-        double tolerance
+        double tolerance,
+        const std::string& solver_choice
     );
 }
