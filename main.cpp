@@ -10,18 +10,19 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    // Ex 1: ciao
+    /* Ex 1: Load the image as an Eigen matrix A with size m×n. Each entry in the matrix corresponds
+    to a pixel on the screen and takes a value somewhere between 0 (black) and 255 (white).
+    Compute the matrix product ATA and report the euclidean norm of ATA */
     std::cout << std::endl;
     std::cout << "Exercise 1: " << std::endl;
     Eigen::MatrixXd image = utilities::get_matrix_from_file("deer.jpg");
-    std::cout << "Image matrix has " << image.rows() << " rows and " << image.cols() << " columns." << std::endl << std::endl;
+    Eigen::MatrixXd ATA = image.transpose() * image;
+    std::cout << "Euclidean norm of ATA: " << ATA.norm() << std::endl << std::endl;
 
-
-    // Ex 2:
+    /* Ex 2:Solve the eigenvalue problem ATAx= λxusing the proper solver provided by the Eigen
+    library. Report the two largest computed singular values of A. */
     std::cout << "Exercise 2: " << std::endl;
-    Eigen::MatrixXd noisy_image = utilities::add_noise_to_matrix(image, 50);
-    utilities::get_png_image_from_matrix(noisy_image, "noisy_deer.png");
-    std::cout << "Saved noisy image as 'noisy_deer.png'." << std::endl << std::endl;
+    
 
     // Ex 3:
     std::cout << "Exercise 3: " << std::endl;
