@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <lis.h>
+#include <optional>
 
 namespace lis_solver
 {
@@ -20,6 +21,8 @@ namespace lis_solver
         const Eigen::SparseMatrix<double>& A_eigen,
         const Eigen::VectorXd& b_eigen,
         double tolerance,
-        const std::string& solver_choice
+        const std::string& solver_choice,
+        const std::string& preconditioner_choice //,
+        //std::optional<int> ilu_fill = std::nullopt
     );
 }
