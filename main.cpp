@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     //LIS_INT err;
     std::cout << std::endl << "Exercise 3: " << std::endl;
     const double tol=1e-10;
-    auto lam1 = lis_solver::elis(ATA, tol, "pi", "jacobi", 5000);
+    auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000);
     std::cout << "Iterations: " << lam1.iterations << std::endl;
     std::cout << "  Residual: " << lam1.residual << std::endl;
     
@@ -60,8 +60,8 @@ int main(int argc, char** argv) {
 
     // Ex 4:
     std::cout << std::endl << "Exercise 4: " << std::endl;
-    double shift = sigma1_eigen*sigma1_eigen - 1.0; 
-    auto lam1_shift = lis_solver::elis(ATA, tol, "si", "jacobi", 5000, shift);
+    double shift = sigma1_eigen*sigma1_eigen - 1000.0; 
+    auto lam1_shift = lis_solver::elis(ATA, tol, "si", "ilu", 5000, shift);
     std::cout << "Largest eigenvalue of ATA with shift " << shift << ": " << lam1_shift.eigenvalue.real() << std::endl;
     std::cout << "Iterations: " << lam1_shift.iterations << std::endl;
     std::cout << "  Residual: " << lam1_shift.residual << std::endl;

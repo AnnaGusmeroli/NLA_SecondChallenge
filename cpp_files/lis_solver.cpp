@@ -235,8 +235,8 @@ namespace lis_solver
                        << " -p " << preconditioner_choice
                        << std::setprecision(17)
                        << std::scientific
-                       << " -tol " << tolerance
-                       << " -maxiter " << max_iter
+                       << " -etol " << tolerance
+                       << " -emaxiter " << max_iter
                        << " -shift " << shift;
 
         std::string opt_str = options_stream.str();
