@@ -201,7 +201,8 @@ namespace lis_solver
         double tolerance,
         const std::string& esolver_choice,
         const std::string& preconditioner_choice,
-        int max_iter
+        int max_iter,
+        double shift
     )
     {
         std::string temp_matrix_filename = "temp_matrix_elis.mtx";
@@ -232,8 +233,11 @@ namespace lis_solver
         std::ostringstream options_stream;
         options_stream << "-e " << esolver_choice
                        << " -p " << preconditioner_choice
+                       << std::setprecision(17)
+                       << std::scientific
                        << " -tol " << tolerance
-                       << " -maxiter " << max_iter;
+                       << " -maxiter " << max_iter
+                       << " -shift " << shift;
 
         std::string opt_str = options_stream.str();
         err = lis_esolver_set_option(const_cast<char*>(opt_str.c_str()), esolver);

@@ -46,6 +46,7 @@ namespace lis_solver
         double tolerance,
         const std::string& esolver_choice,
         const std::string& preconditioner_choice,
-        int max_iter = 1000
+        int max_iter = 1000,
+        double shift = 0.0
     );
 }
