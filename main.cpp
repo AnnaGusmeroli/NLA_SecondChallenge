@@ -30,8 +30,28 @@ int main(int argc, char** argv) {
         Eigen::VectorXd singular_values = saeigensolver.eigenvalues().cwiseMax(0.0).array().sqrt().matrix();
         std::cout << "The two largest singular values of ATA are:\n" << singular_values.tail(2) << std::endl;
     
-    // Ex 3:
+    /* Ex 3:Export matrix ATA in the matrix market format and move it to the lis-2.1.10_test
+    folder. Using the proper iterative solver available in the LIS library compute the largest
+    eigenvalue of ATA up to a tolerance of 10−10. Report the computed eigenvalue. Is the
+    result in agreement with the one obtained in the previous point? */
+    //LIS_INT err;
+    const double tol=1e-10;
+    auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000);
+    std::cout << "Iterations: " << lam1.iterations << std::endl;
+    std::cout << "  Residual: " << lam1.residual << std::endl;
+    lis_finalize();
     
+    const double sigma1_eigen = singular_values(singular_values.size() - 1);
+    //in this case is not possible to use tail bc the result would be a size one vector and we wouldn't be able to confront the two values
+    const double sigma1_lis = std::sqrt(lam1.eigenvalue.real()); //the result is complex althougt the imaginary part should be 0 since ATA is spd
+    std::cout << "sigma1 is " << sigma1_eigen << " with saeigensolver" << std::endl;
+    std::cout << "sigma1 is " << sigma1_lis << " with lis" << std::endl;
+    if (sigma1_eigen-sigma1_lis <tol && std::abs(lam1.eigenvalue.imag()<tol)){
+        std::cout << "the results are coerent" << std::endl << std::endl;
+    }
+    else{
+        std::cout << "the results are not coerent" << std::endl << std::endl;
+    }
     // Ex 4:
    
     // Ex 5:
