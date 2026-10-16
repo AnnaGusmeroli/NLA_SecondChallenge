@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     // Ex 5:
     std::cout << std::endl << "Exercise 5: " << std::endl;
-    std::cout << "Computing the SVD of the image matrix A using Eigen's JacobiSVD." << std::endl;
+    std::cout << "Computing the SVD of the image matrix A using Eigen's BDCSVD." << std::endl;
     Eigen::BDCSVD<Eigen::MatrixXd> svd(image, Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::VectorXd singular_values_svd = svd.singularValues();
 
@@ -100,22 +100,43 @@ int main(int argc, char** argv) {
     Eigen::VectorXd compressed_image_k1_vector = utilities::convert_matrix_to_vector(compressed_image_k1);
     compressed_image_k1_vector = utilities::clamp_image(compressed_image_k1_vector, 0, 255);
     compressed_image_k1 = utilities::convert_vector_to_matrix(compressed_image_k1_vector, compressed_image_k1.rows(), compressed_image_k1.cols());
-    utilities::get_png_image_from_matrix(compressed_image_k1, "compressed_image_k1.jpg");
-    std::cout << "Compressed image saved as compressed_image_k1.jpg" << std::endl;
+    utilities::get_png_image_from_matrix(compressed_image_k1, "compressed_image_k1.png");
+    std::cout << "Compressed image saved as compressed_image_k1.png" << std::endl;
     std::cout << "Compressing the image using the first k2 = " << k2 << " singular values and vectors." << std::endl;
     Eigen::MatrixXd compressed_image_k2 = C_k2 * D_k2.transpose();
     Eigen::VectorXd compressed_image_k2_vector = utilities::convert_matrix_to_vector(compressed_image_k2);
     compressed_image_k2_vector = utilities::clamp_image(compressed_image_k2_vector, 0, 255);
     compressed_image_k2 = utilities::convert_vector_to_matrix(compressed_image_k2_vector, compressed_image_k2.rows(), compressed_image_k2.cols());
-    utilities::get_png_image_from_matrix(compressed_image_k2, "compressed_image_k2.jpg");
-    std::cout << "Compressed image saved as compressed_image_k2.jpg" << std::endl;
+    utilities::get_png_image_from_matrix(compressed_image_k2, "compressed_image_k2.png");
+    std::cout << "Compressed image saved as compressed_image_k2.png" << std::endl;
     
+
     // Ex 8:
-    
-    
+    Eigen::MatrixXd checkerboard_image(400, 400);
+    checkerboard_image.setZero();
+    for (int i = 0; i < checkerboard_image.rows(); ++i) {
+        for (int j = 0; j < checkerboard_image.cols(); ++j) {
+            if ((i / 40 + j / 40) % 2 == 0) {
+                checkerboard_image(i, j) = 0; // Black square
+            } else {
+                checkerboard_image(i, j) = 255;   // White square
+            }
+        }
+    }
+    Eigen::VectorXd checkerboard_vector = utilities::convert_matrix_to_vector(checkerboard_image);
+    utilities::get_png_image_from_matrix(checkerboard_image, "checkerboard_image.png");
+    std::cout << "Checkerboard image saved as checkerboard_image.png" << std::endl;
+    std::cout << "The norm of the checkerboard image matrix is: " << checkerboard_image.norm() << std::endl;
 
 
     // Ex 9:
+    std::cout << std::endl << "Exercise 9: " << std::endl;
+    std::cout << "Adding noise to the checkerboard image." << std::endl;
+    Eigen::MatrixXd noisy_checkerboard_image = utilities::add_noise_to_matrix(checkerboard_image, 60.0);
+    Eigen::VectorXd noisy_checkerboard_vector = utilities::convert_matrix_to_vector(noisy_checkerboard_image);
+    utilities::get_png_image_from_matrix(noisy_checkerboard_image, "noisy_checkerboard_image.png");
+    std::cout << "Noisy checkerboard image saved as noisy_checkerboard_image.png" << std::endl;
+
     
     // Ex 10:
     
