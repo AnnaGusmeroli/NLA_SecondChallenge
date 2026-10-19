@@ -1,16 +1,13 @@
-# Numerical Linear Algebra — Challenge 1
+# Numerical Linear Algebra — Challenge 2
 
-Implementation of the first Numerical Linear Algebra challenge. The project
-uses [Eigen](https://eigen.tuxfamily.org/) for dense and sparse linear algebra
-and [LIS](https://www.ssisc.org/lis/) for iterative linear-system solvers.
+Implementation of the second Numerical Linear Algebra challenge, focused on
+singular value decomposition, image compression, and noise reduction.
 
-## Github repository
+The program uses:
 
-You can find this challenge on github on the following link:
-
-```link
-https://github.com/FrancescoBarrale/NLA-_FirstChallenge.git
-```
+- [Eigen](https://eigen.tuxfamily.org/) for dense linear algebra and SVD;
+- [LIS](https://www.ssisc.org/lis/) for iterative eigenvalue computations;
+- `stb_image` and `stb_image_write` for reading and writing images.
 
 ## Students
 
@@ -20,16 +17,19 @@ https://github.com/FrancescoBarrale/NLA-_FirstChallenge.git
 
 ## Overview
 
-The program processes `deer.jpg` as a grayscale image and completes all 13
-challenge exercises. Results will appear in the terminal after running the code.
+The program reads `deer.jpg` as a grayscale matrix and performs all 13
+exercises from the challenge.
+
+Pixel values are clamped to the range [0, 255] before being written as
+grayscale PNG files.
 
 ## Requirements
 
-The project is intended to run in the course container with:
+The project is intended to run in the course environment with:
 
 - GCC and `mpicxx`;
 - Eigen 3;
-- the LIS library;
+- LIS;
 - GNU Make.
 
 Load the course environment before building:
@@ -42,12 +42,15 @@ module load lis
 
 ## Build and run
 
-Change to the directory containing this README, then run:
+From the directory containing this README, run:
 
 ```bash
 make
 ./main
 ```
+
+The program expects `deer.jpg` in the project root. The output and solver
+statistics are printed to the terminal.
 
 To remove the executable and intermediate object files and rebuild from
 scratch:
@@ -57,35 +60,29 @@ make clean
 make
 ```
 
-Additional build targets are available for development:
+Additional build targets are available:
 
 ```bash
-make debug    # clean build with debug symbols and no optimisation
+make run      # build, then run the program
+make debug    # clean debug build
 make release  # clean optimised build
 ```
 
 ## Generated files
 
-During execution, progress and solver statistics for all 13 exercises are
-printed to the terminal.
+The program creates the `png_files/` directory if it does not already exist.
+The following grayscale PNG files are generated:
 
-The following image files are created in the folder `png_files/`:
+- `checkerboard_image.png` — original 400×400 checkerboard;
+- `noisy_checkerboard_image.png` — checkerboard with random noise;
+- `compressed_image_k1.png` — deer image compressed with \(k=30\);
+- `compressed_image_k2.png` — deer image compressed with \(k=90\);
+- `compressed_noisy_k3.png` — noisy checkerboard compressed with \(k=6\);
+- `compressed_noisy_k4.png` — noisy checkerboard compressed with \(k=12\).
 
-- `noisy_deer.png` — noisy input image;
-- `blurred_noisy_deer.png` — smoothed noisy image;
-- `sharpened_deer.png` — sharpened image;
-- `x.png` — image reconstructed with the LIS solver;
-- `Edge_detection_deer.png` — Sobel edge-detection result;
-- `y.png` — image reconstructed with the Eigen solver.
-
-The sparse matrix and right-hand-side vector (not required by this code) are also
-exported in Matrix Market format:
-
-- `A2.mtx`;
-- `w.mtx`.
-
-The PNG output directory is created automatically if it does not already
-exist.
+The LIS eigenvalue wrapper also writes the temporary Matrix Market file
+`temp_matrix_elis.mtx` in the project root. It contains the sparse
+representation of \(A^T A\) used by LIS.
 
 ## Project structure
 
@@ -93,22 +90,18 @@ exist.
 .
 ├── main.cpp                 # Entry point and challenge exercises
 ├── cpp_files/
-│   ├── lis_solver.cpp       # LIS solver implementation
-│   └── utilities.cpp        # Image and sparse-matrix implementations
+│   ├── lis_solver.cpp       # LIS eigenvalue solver wrapper
+│   └── utilities.cpp        # Image, noise, conversion, and PNG utilities
 ├── hpp_files/
 │   ├── lis_solver.hpp       # LIS solver declarations
 │   ├── utilities.hpp        # Utility declarations
-│   ├── stb_image.h          # read image
-│   └── stb_image_write.h    # write image
-
-├── deer.jpg                 # Input image
+│   ├── stb_image.h          # Image reader
+│   └── stb_image_write.h    # Image writer
+├── deer.jpg                 # Input grayscale image
+├── Challenge2.pdf           # Challenge statement
 ├── Makefile
 └── png_files/               # Generated PNG images
 ```
 
-Files stb_image.h and stb_image_write.h, included int the hpp_files folder, are taken from the laboratories of the course.
-
-## Troubleshooting
-
-- **The input image cannot be loaded:** run `./main` from the project root,
-  where `deer.jpg` is located.
+The `stb_image` and `stb_image_write` headers are course-provided image
+utilities included in the project.

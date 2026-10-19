@@ -1,14 +1,8 @@
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 
-#include <iostream>
 #include <Eigen/Dense>
-#include <Eigen/Sparse>
-#include <unsupported/Eigen/SparseExtra>
-#include "stb_image.h"
-#include "stb_image_write.h"
-#include <random>
-#include <algorithm>
+#include <string>
 
 // Function declarations
 namespace utilities
@@ -21,13 +15,7 @@ namespace utilities
     Eigen::VectorXd convert_matrix_to_vector(const Eigen::MatrixXd& matrix);
     Eigen::MatrixXd convert_vector_to_matrix(const Eigen::VectorXd& vector, int rows, int cols);
 
-    Eigen::SparseMatrix<double> buildAconvolutionoperator(int n, int m, Eigen::MatrixXd H);
-
     Eigen::VectorXd clamp_image(Eigen::VectorXd& image_vector, int min_value, int max_value);
-
-    bool is_symmetric(const Eigen::SparseMatrix<double>& m);
-
-
 }
 
 #endif // UTILITIES_HPP

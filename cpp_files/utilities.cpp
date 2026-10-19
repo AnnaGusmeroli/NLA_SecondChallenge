@@ -7,12 +7,17 @@
 #endif
 
 #include "utilities.hpp"
+#include "stb_image.h"
+#include "stb_image_write.h"
 
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 
 #include <filesystem>
+#include <algorithm>
+#include <iostream>
+#include <random>
 
 // Function definitions
 namespace utilities
@@ -133,56 +138,6 @@ namespace utilities
         return matrix;
     }
 
-    // Function to build a convolution operator, given the dimensions of the image and the convolution kernel H
-    Eigen::SparseMatrix<double> buildAconvolutionoperator(int n, int m, Eigen::MatrixXd H)
-    {
-        if (H.rows() != H.cols())
-        {
-            std::cerr << "Error: H must be a square matrix." << std::endl;
-            return Eigen::SparseMatrix<double>(); // Return zero matrix if H is not square
-        }
-        
-        Eigen::SparseMatrix<double> A(n*m, n*m);
-        std::vector<Eigen::Triplet<double>> tripletList;
-
-        int l=H.rows();
-        tripletList.reserve(n * m * l * l);
-
-        // Loop over each output pixel in the image
-        for (int i = 0; i < n ; ++i)
-        {
-            for (int j = 0; j< m; ++j)
-            {
-                // Loop over each element in the convolution kernel H
-                for (int h = 0; h < l; ++h)
-                {   
-                    for (int k = 0; k < l; ++k)
-                    {
-                        // Calculate the corresponding input pixel for the
-                        // current output pixel and kernel element.
-                        int row = i + h - l/2;
-                        int col = j + k - l/2;
-                        // Ignore out-of-bounds input pixels, as required by
-                        // the zero-padding convention in the challenge.
-                        if (row >= 0 && row < n && col >= 0 && col < m && H(h, k) != 0.0){
-                            // A(output, input) = H(h, k).
-                            tripletList.push_back(
-                                Eigen::Triplet<double>(
-                                    i*m + j,
-                                    row*m + col,
-                                    H(h, k)
-                                )
-                            );
-                        }
-                    }
-                }
-            }
-        }
-        // Set the triplet list to the sparse matrix A
-        A.setFromTriplets(tripletList.begin(), tripletList.end());
-        return A;
-    }
-
     // Function to clamp the values of an Eigen vector within a specified range [min_value, max_value]
     Eigen::VectorXd clamp_image(Eigen::VectorXd& image_vector, int min_value, int max_value)
     {
@@ -194,14 +149,4 @@ namespace utilities
         return clamped_vector;
     }
 
-    // Function to check if a sparse matrix is symmetric
-    bool is_symmetric(const Eigen::SparseMatrix<double>& m)
-    {
-        Eigen::SparseMatrix<double> m_t = m.transpose(); //this passage is necessary cause m.traspose() is row-major and m is column-major, so doing the difference directly resulted in a error
-        //by saving the traspose we ensure that both matrices are column-major
-
-        Eigen::SparseMatrix<double> diff = m_t - m;
-    
-        return diff.norm() < 1e-12;
-    }
 }

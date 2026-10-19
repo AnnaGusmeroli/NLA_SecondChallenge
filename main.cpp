@@ -42,8 +42,9 @@ int main(int argc, char** argv) {
     const double tol=1e-10;
     auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000);
     std::cout << "Iterations: " << lam1.iterations << std::endl;
-    std::cout << "  Residual: " << lam1.residual << std::endl;
-    
+    std::cout << "Residual: " << lam1.residual << std::endl;
+    std::cout << "Tolerance: " << tol << std::endl;
+
     const double sigma1_eigen = singular_values(singular_values.size() - 1);
     //in this case is not possible to use tail bc the result would be a size one vector and we wouldn't be able to confront the two values
     const double sigma1_lis = std::sqrt(lam1.eigenvalue.real()); //the result is complex althougt the imaginary part should be 0 since ATA is spd
@@ -60,11 +61,16 @@ int main(int argc, char** argv) {
 
     // Ex 4:
     std::cout << std::endl << "Exercise 4: " << std::endl;
-    double shift = sigma1_eigen*sigma1_eigen - 1000.0; 
-    auto lam1_shift = lis_solver::elis(ATA, tol, "si", "ilu", 5000, shift);
+    double shift = sigma1_eigen*sigma1_eigen; 
+    auto lam1_shift = lis_solver::elis(ATA, tol, "ii", "ilu", 5000, shift);
     std::cout << "Largest eigenvalue of ATA with shift " << shift << ": " << lam1_shift.eigenvalue.real() << std::endl;
-    std::cout << "Iterations: " << lam1_shift.iterations << std::endl;
-    std::cout << "  Residual: " << lam1_shift.residual << std::endl;
+    std::cout << "Iterations with shift: " << lam1_shift.iterations << std::endl;
+    std::cout << "Residual with shift: " << lam1_shift.residual << std::endl;
+    std::cout << "Tolerance with shift: " << tol << std::endl;
+
+    std::cout << "Resisiduals difference: " << std::abs(lam1_shift.residual - lam1.residual) << std::endl;
+    std::cout << "Iterations difference: " << std::abs(lam1_shift.iterations - lam1.iterations) << std::endl;
+    std::cout << "Eigenvalue difference: " << std::abs(lam1_shift.eigenvalue.real() - lam1.eigenvalue.real()) << std::endl;
 
 
     // Ex 5:
@@ -138,14 +144,64 @@ int main(int argc, char** argv) {
     std::cout << "Noisy checkerboard image saved as noisy_checkerboard_image.png" << std::endl;
 
     
-    // Ex 10:
-    
+    // Ex 10: Using the SVD module of the Eigen library, perform a singular value decomposition of the matrix corresponding to the noisy image. Report the two largest computed singular values.
+    std::cout << std::endl << "Exercise 10: " << std::endl;
+    std::cout << "Computing the SVD of the noisy image matrix using Eigen's BDCSVD." << std::endl;
+    Eigen::BDCSVD<Eigen::MatrixXd> svd_noisy(noisy_checkerboard_image, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::VectorXd singular_values_noisy = svd_noisy.singularValues();
 
-    // Ex 11:
-    
-    // Ex 12:
-    
-    // Ex 13:
+    Eigen::MatrixXd U_noisy = svd_noisy.matrixU();
+    Eigen::MatrixXd V_noisy = svd_noisy.matrixV();
+    Eigen::MatrixXd S_noisy = singular_values_noisy.asDiagonal();
+
+    //singular values ordered in a decreasing manner
+    std::cout << "The two largest singular values of the noisy image are:\n"
+              << singular_values_noisy.head(2) << std::endl;
+
+
+    // Ex 11: Starting from the previously computed SVD, create the matrices C and D defined in (1) assuming k = 6 and k = 12. Report the size of the matrices C and D.
+    std::cout << std::endl << "Exercise 11: " << std::endl;
+    int k3 = 6;
+    int k4 = 12;
+    Eigen::MatrixXd C_k3 = U_noisy.leftCols(k3);
+    Eigen::MatrixXd D_k3 = V_noisy.leftCols(k3) * S_noisy.topLeftCorner(k3, k3);
+    Eigen::MatrixXd C_k4 = U_noisy.leftCols(k4);
+    Eigen::MatrixXd D_k4 = V_noisy.leftCols(k4) * S_noisy.topLeftCorner(k4, k4);
+    std::cout << "Size of the matrix C_k3 (k = " << k3 << "): " << C_k3.rows() << " X " << C_k3.cols() << std::endl;
+    std::cout << "Size of the matrix D_k3 (k = " << k3 << "): " << D_k3.rows() << " X " << D_k3.cols() << std::endl;
+    std::cout << "Size of the matrix C_k4 (k = " << k4 << "): " << C_k4.rows() << " X " << C_k4.cols() << std::endl;
+    std::cout << "Size of the matrix D_k4 (k = " << k4 << "): " << D_k4.rows() << " X " << D_k4.cols() << std::endl;
+
+
+    // Ex 12: Compute the compressed images as the matrix product CD (again for k = 6 and k = 12). Export and upload the resulting images in .png.
+    std::cout << std::endl << "Exercise 12: " << std::endl;
+    std::cout << "Compressing the noisy image using the first k3 = " << k3 << " singular values and vectors." << std::endl;
+    Eigen::MatrixXd compressed_noisy_k3 = C_k3 * D_k3.transpose();
+    Eigen::VectorXd compressed_noisy_k3_vector = utilities::convert_matrix_to_vector(compressed_noisy_k3);
+    compressed_noisy_k3_vector = utilities::clamp_image(compressed_noisy_k3_vector, 0, 255);
+    compressed_noisy_k3 = utilities::convert_vector_to_matrix(compressed_noisy_k3_vector, compressed_noisy_k3.rows(), compressed_noisy_k3.cols());
+    utilities::get_png_image_from_matrix(compressed_noisy_k3, "compressed_noisy_k3.png");
+    std::cout << "Compressed image saved as compressed_noisy_k3.png" << std::endl;
+    std::cout << "Compressing the noisy image using the first k4 = " << k4 << " singular values and vectors." << std::endl;
+    Eigen::MatrixXd compressed_noisy_k4 = C_k4 * D_k4.transpose();
+    Eigen::VectorXd compressed_noisy_k4_vector = utilities::convert_matrix_to_vector(compressed_noisy_k4);
+    compressed_noisy_k4_vector = utilities::clamp_image(compressed_noisy_k4_vector, 0, 255);
+    compressed_noisy_k4 = utilities::convert_vector_to_matrix(compressed_noisy_k4_vector, compressed_noisy_k4.rows(), compressed_noisy_k4.cols());
+    utilities::get_png_image_from_matrix(compressed_noisy_k4, "compressed_noisy_k4.png");
+    std::cout << "Compressed image saved as compressed_noisy_k4.png" << std::endl;
+
+
+    // Ex 13: Compare the compressed images with the original and noisy images. Comment the results.
+    std::cout << std::endl << "Exercise 13: " << std::endl;
+    std::cout << "Comparing the compressed images with the original and noisy checkerboard." << std::endl;
+    std::cout << "Norm of the original checkerboard: " << checkerboard_image.norm() << std::endl;
+    std::cout << "Norm of the noisy checkerboard: " << noisy_checkerboard_image.norm() << std::endl;
+    std::cout << "Relative error (k = " << k3 << ") with respect to the original: "
+              << (compressed_noisy_k3 - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
+    std::cout << "Relative error (k = " << k4 << ") with respect to the original: "
+              << (compressed_noisy_k4 - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
+    std::cout << "Relative error of the noisy image with respect to the original: "
+              << (noisy_checkerboard_image - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
 
     lis_finalize();
     
