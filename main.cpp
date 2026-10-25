@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
     std::cout << "is slightly cleaner. Looking very carefully it is also noticeable that the black " << std::endl;
     std::cout << "squares in the compressed images look a bit less dark then in the original one, " << std::endl;
     std::cout << "that is because the interval [0, 255] reduces the contrast " << std::endl;
-    std::cout << "(adding negative noise on black pixels and positive on white ones " << std::endl;
+    std::cout << "(adding negative noise on black pixels and positive on white ones and then clamping in the range [0, 255] " << std::endl;
     std::cout << "shifts the average pixel values inward and reduces the gap between black and white) " << std::endl;
     std::cout << "and the SVD cannot recover the loss.  In conclusion, the truncated SVD method needs " << std::endl;
     std::cout << "to be used in a way that balances the compression of the images and " << std::endl;
