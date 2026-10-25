@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> saeigensolver(ATA);
     if (saeigensolver.info() != Eigen::Success) abort();
         Eigen::VectorXd singular_values = saeigensolver.eigenvalues().cwiseMax(0.0).array().sqrt().matrix();
-        std::cout << "The two largest singular values of ATA are:\n" << singular_values.tail(2) << std::endl;
+        std::cout << "The two largest singular values of A are:\n" << singular_values.tail(2) << std::endl;
     
 
     /* Ex 3:Export matrix ATA in the matrix market format and move it to the lis-2.1.10_test
@@ -38,18 +38,17 @@ int main(int argc, char** argv) {
     result in agreement with the one obtained in the previous point? */
     std::cout << std::endl << "Exercise 3: " << std::endl;
     const double tol=1e-10;
-    auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000);
+    auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000); // This function exports the matrix in the matrix market format and then uses the lis library (etest1) to compute the largest eigenvalue of ATA
     std::cout << "Iterations: " << lam1.iterations << std::endl;
     std::cout << "Residual: " << lam1.residual << std::endl;
     std::cout << "Tolerance: " << tol << std::endl;
 
-    const double sigma1_eigen = singular_values(singular_values.size() - 1);
-    //in this case is not possible to use tail bc the result would be a size one vector and we wouldn't be able to confront the two values
-    const double sigma1_lis = std::sqrt(lam1.eigenvalue.real()); //the result is complex althougt the imaginary part should be 0 since ATA is spd
-    std::cout << "Largest eigenvalue of ATA with lis: " << lam1.eigenvalue.real() << std::endl;
-    std::cout << "sigma1 is " << sigma1_eigen << " with saeigensolver" << std::endl;
-    std::cout << "sigma1 is " << sigma1_lis << " with lis" << std::endl;
-    if (std::abs(sigma1_eigen - sigma1_lis) < tol &&
+    const double lambda1_lis = lam1.eigenvalue.real(); //the result is complex althougt the imaginary part should be 0 since ATA is spd
+    const double lambda1_eigen = saeigensolver.eigenvalues()(saeigensolver.eigenvalues().size() - 1); //in this case is not possible to use tail bc the result would be a size one vector and we wouldn't be able to confront the two values
+    std::cout << "Largest eigenvalue of ATA with lis: " << lambda1_lis << std::endl;
+    std::cout << "Largest eigenvalue of ATA with saeigensolver: " << lambda1_eigen << std::endl;
+    std::cout << "Difference: " << std::abs(lambda1_lis - lambda1_eigen) << std::endl;
+    if (std::abs(lambda1_eigen - lambda1_lis) / std::abs(lambda1_eigen) < tol &&
         std::abs(lam1.eigenvalue.imag()) < tol){
         std::cout << "the results are coerent" << std::endl;
     }
@@ -60,7 +59,7 @@ int main(int argc, char** argv) {
 
     // Ex 4:
     std::cout << std::endl << "Exercise 4: " << std::endl;
-    double shift = 0.99*sigma1_eigen*sigma1_eigen; //We multiply by 0.99 to avoid the singularity of the matrix ATA - shift*I
+    double shift = 0.99*lambda1_eigen; //We multiply by 0.99 to avoid the singularity of the matrix ATA - shift*I
     auto lam1_shift = lis_solver::elis(ATA, tol, "ii", "ilu", 5000, shift);
     std::cout << "Largest eigenvalue of ATA with shift " << shift << ": " << lam1_shift.eigenvalue.real() << std::endl;
     std::cout << "Iterations with shift: " << lam1_shift.iterations << std::endl;

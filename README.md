@@ -2,6 +2,12 @@
 
 Implementation of the second Numerical Linear Algebra challenge.
 
+The challenge is available also on GitHub:
+
+```Link
+https://github.com/AnnaGusmeroli/NLA_SecondChallenge.git
+```
+
 The program uses:
 
 - [Eigen](https://eigen.tuxfamily.org/) for dense linear algebra and SVD;
