@@ -18,7 +18,6 @@ int main(int argc, char** argv) {
     std::cout << "Exercise 1: " << std::endl;
     Eigen::MatrixXd image = utilities::get_matrix_from_file("deer.jpg");
     std::cout << "Image size:" << image.rows() << " X " << image.cols() << std::endl;
-    std::cout << "Non zero entries:" << image.nonZeros() << std::endl;
     Eigen::MatrixXd ATA = image.transpose() * image;
     std::cout << "Euclidean norm of ATA: " << ATA.norm() << std::endl << std::endl;
 
@@ -47,6 +46,7 @@ int main(int argc, char** argv) {
     const double sigma1_eigen = singular_values(singular_values.size() - 1);
     //in this case is not possible to use tail bc the result would be a size one vector and we wouldn't be able to confront the two values
     const double sigma1_lis = std::sqrt(lam1.eigenvalue.real()); //the result is complex althougt the imaginary part should be 0 since ATA is spd
+    std::cout << "Largest eigenvalue of ATA with lis: " << lam1.eigenvalue.real() << std::endl;
     std::cout << "sigma1 is " << sigma1_eigen << " with saeigensolver" << std::endl;
     std::cout << "sigma1 is " << sigma1_lis << " with lis" << std::endl;
     if (std::abs(sigma1_eigen - sigma1_lis) < tol &&
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 
     // Ex 4:
     std::cout << std::endl << "Exercise 4: " << std::endl;
-    double shift = sigma1_eigen*sigma1_eigen; 
+    double shift = 0.99*sigma1_eigen*sigma1_eigen; //We multiply by 0.99 to avoid the singularity of the matrix ATA - shift*I
     auto lam1_shift = lis_solver::elis(ATA, tol, "ii", "ilu", 5000, shift);
     std::cout << "Largest eigenvalue of ATA with shift " << shift << ": " << lam1_shift.eigenvalue.real() << std::endl;
     std::cout << "Iterations with shift: " << lam1_shift.iterations << std::endl;
@@ -117,6 +117,7 @@ int main(int argc, char** argv) {
     
 
     // Ex 8:
+    std::cout << std::endl << "Exercise 8: " << std::endl;
     Eigen::MatrixXd checkerboard_image(400, 400);
     checkerboard_image.setZero();
     for (int i = 0; i < checkerboard_image.rows(); ++i) {

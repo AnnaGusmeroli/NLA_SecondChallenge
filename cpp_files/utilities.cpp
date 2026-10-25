@@ -87,7 +87,7 @@ namespace utilities
         {
             for (int j = 0; j < width; j++)
             {
-                image[i * width + j] = static_cast<unsigned char>(matrix(i, j));
+                image[i * width + j] = std::round(matrix(i, j));
             }
         }
 
