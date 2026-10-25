@@ -1,7 +1,6 @@
 # Numerical Linear Algebra — Challenge 2
 
-Implementation of the second Numerical Linear Algebra challenge, focused on
-singular value decomposition, image compression, and noise reduction.
+Implementation of the second Numerical Linear Algebra challenge.
 
 The program uses:
 

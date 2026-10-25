@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
     folder. Using the proper iterative solver available in the LIS library compute the largest
     eigenvalue of ATA up to a tolerance of 10−10. Report the computed eigenvalue. Is the
     result in agreement with the one obtained in the previous point? */
-    //LIS_INT err;
     std::cout << std::endl << "Exercise 3: " << std::endl;
     const double tol=1e-10;
     auto lam1 = lis_solver::elis(ATA, tol, "pi", "ilu", 5000);
@@ -194,14 +193,33 @@ int main(int argc, char** argv) {
     // Ex 13: Compare the compressed images with the original and noisy images. Comment the results.
     std::cout << std::endl << "Exercise 13: " << std::endl;
     std::cout << "Comparing the compressed images with the original and noisy checkerboard." << std::endl;
-    std::cout << "Norm of the original checkerboard: " << checkerboard_image.norm() << std::endl;
-    std::cout << "Norm of the noisy checkerboard: " << noisy_checkerboard_image.norm() << std::endl;
     std::cout << "Relative error (k = " << k3 << ") with respect to the original: "
               << (compressed_noisy_k3 - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
     std::cout << "Relative error (k = " << k4 << ") with respect to the original: "
               << (compressed_noisy_k4 - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
     std::cout << "Relative error of the noisy image with respect to the original: "
               << (noisy_checkerboard_image - checkerboard_image).norm() / checkerboard_image.norm() << std::endl;
+    
+    std::cout << "COMMENT ON THE RESULTS: " << std::endl;
+    std::cout << "It is very noticeable looking at the “deer image” that a lower value of " << std::endl;
+    std::cout << "k means having more compression because less data is used. " << std::endl;
+    std::cout << "In fact, the image with k=30 has a very bad quality and not many details. " << std::endl;
+    std::cout << "This is also supported by our calculation: the matrices C and D have 19680 non-zero " << std::endl;
+    std::cout << "entries each for k = 30 and 59040 each for k = 90, against the 430336 entries of A. " << std::endl;
+    std::cout << "The effect on quality depends on the image. " << std::endl;
+    std::cout << "The checkerboard is a very simple image with only two dominant singular values, " << std::endl;
+    std::cout << "so a small k is enough to keep most details, instead the deer image is real photograph " << std::endl;
+    std::cout << "and needs at least k=90. In the checkerboard image, it is observable that a low k " << std::endl;
+    std::cout << "also reduces noise. The relative error with respect to the original goes from 0.137 " << std::endl;
+    std::cout << "of the noisy image to 0.0873 with k = 6 and 0.0908 with k = 12. The k = 6 image " << std::endl;
+    std::cout << "is slightly cleaner. Looking very carefully it is also noticeable that the black " << std::endl;
+    std::cout << "squares in the compressed images look a bit less dark then in the original one, " << std::endl;
+    std::cout << "that is because the interval [0, 255] reduces the contrast " << std::endl;
+    std::cout << "(adding negative noise on black pixels and positive on white ones " << std::endl;
+    std::cout << "shifts the average pixel values inward and reduces the gap between black and white) " << std::endl;
+    std::cout << "and the SVD cannot recover the loss.  In conclusion, the truncated SVD method needs " << std::endl;
+    std::cout << "to be used in a way that balances the compression of the images and " << std::endl;
+    std::cout << "the detail preservation. " << std::endl;
 
     lis_finalize();
     
